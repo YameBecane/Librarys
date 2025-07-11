@@ -1501,6 +1501,54 @@ function imgui:CreateWindow(Window)
             return Drops
         end
         
+        function TabV:AddButton(Button)
+            Button.Title = Button.Title or "Button"
+            Button.Callback = Button.Callback or function() end
+            
+            local buttons = {}
+            
+            local FButton = Instance.new("Frame")
+            FButton.Name = "FButton"
+            FButton.Parent = Scroll
+            FButton.ClipsDescendants = false
+            FButton.BackgroundTransparency = 0
+            FButton.BackgroundColor3 = Color3.fromRGB(35, 35, 35)
+            FButton.BorderSizePixel = 0
+            FButton.Size = UDim2.new(1, -10, 0, 30)
+            
+            local UiFB = Instance.new("UICorner")
+            UiFB.CornerRadius = UDim.new(0, 12)
+            UiFB.Parent = FButton
+            
+            local Title = Instance.new("TextLabel")
+            Title.Name = "Title"
+            Title.Size = UDim2.new(1, -5, 0, 25)
+            Title.BackgroundTransparency = 1
+            Title.Text = Button.Title
+            Title.TextColor3 = Config.Text
+            Title.AnchorPoint = Vector2.new(0, 0.5) 
+            Title.Position = UDim2.new(0, 5, 0.5, 0)
+            Title.TextSize = Config.SubSize
+            Title.Font = Config.Font
+            Title.TextXAlignment = Enum.TextXAlignment.Left
+            Title.Parent = FButton
+            
+            local OnClick = Instance.new("TextButton")
+            OnClick.Name = "OnClick"
+            OnClick.Parent = FButton
+            OnClick.BackgroundTransparency = 1
+            OnClick.BorderSizePixel = 0
+            OnClick.Size = UDim2.new(1, 0, 1, 0)
+            OnClick.Text = ""
+            OnClick.ZIndex = 10
+            
+            OnClick.MouseButton1Click:Connect(function()
+                Button.Callback()
+            end)
+            
+            return buttons
+        end
+        
         return TabV
     end
     return Tabs
