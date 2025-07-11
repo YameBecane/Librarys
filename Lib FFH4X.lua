@@ -536,34 +536,7 @@ function imgui:CreateWindow(Window)
                 end
             end)
             
-            -- Dentro de TabV:AddCheckBox
-            local checkboxAPI = {
-                SetValue = function(newValue)
-                    Value = newValue
-                    Check.Callback(Value)
-                    if Value then
-                        icon.Image = "rbxassetid://7733715400"
-                        CheckHolder.BackgroundTransparency = 0.1
-                    else
-                        icon.Image = ""
-                        CheckHolder.BackgroundTransparency = 0.5
-                    end
-                end,
-                GetValue = function()
-                    return Value
-                end,
-                Update = function(newOptions)
-                    if newOptions.title then
-                        Title.Text = newOptions.title
-                    end
-                    if newOptions.default ~= nil then
-                        checkboxAPI.SetValue(newOptions.default)
-                    end
-                end
-            }
-            
-            return setmetatable(CheckBoxs, {__index = checkboxAPI})
-            
+            return CheckBoxs
         end
 
         function TabV:AddToggle(Toggle)
@@ -666,30 +639,7 @@ function imgui:CreateWindow(Window)
                 ballTween:Play()
             end)
             
-            -- Dentro de TabV:AddToggle
-            local toggleAPI = {
-                SetValue = function(newValue)
-                    Value = newValue
-                    Toggle.Callback(Value)
-                    
-                    local targetPosition = Value and UDim2.new(1, -20, 0.5, 0) or UDim2.new(0, 0, 0.5, 0)
-                    Ball.Position = targetPosition
-                    Ball.BackgroundTransparency = Value and 0.1 or 0.5
-                end,
-                GetValue = function()
-                    return Value
-                end,
-                Update = function(newOptions)
-                    if newOptions.title then
-                        Title.Text = newOptions.title
-                    end
-                    if newOptions.default ~= nil then
-                        toggleAPI.SetValue(newOptions.default)
-                    end
-                end
-            }
-            
-            return setmetatable(Toggles, {__index = toggleAPI})
+            return Toggles
         end
     
         function TabV:AddSlider(Slide)
@@ -851,29 +801,7 @@ function imgui:CreateWindow(Window)
                 end
             end)
             
-            -- Dentro de TabV:AddSlider
-            local sliderAPI = {
-                SetValue = function(newValue)
-                    newValue = math.clamp(newValue, Slide.Min, Slide.Max)
-                    local scale = (newValue - Slide.Min) / (Slide.Max - Slide.Min)
-                    local newPos = sliderMinX + (scale * sliderWidth)
-                    OnClick.Position = UDim2.new(0, newPos, 0.5, 0)
-                    Value.Text = tostring(math.floor(newValue))
-                    Slide.Callback(newValue)
-                end,
-                GetValue = function()
-                    return tonumber(Value.Text)
-                end,
-                Update = function(newOptions)
-                    if newOptions.min then Slide.Min = newOptions.min end
-                    if newOptions.max then Slide.Max = newOptions.max end
-                    if newOptions.default then
-                        sliderAPI.SetValue(newOptions.default)
-                    end
-                end
-            }
-            
-            return setmetatable(Sliders, {__index = sliderAPI})
+            return Sliders
         end
         
         function TabV:AddColorpicker(ColorPicker)
@@ -1282,59 +1210,9 @@ function imgui:CreateWindow(Window)
                 FMainColor.Visible = UiOpen
             end)
             
-            -- Dentro de TabV:AddColorpicker
-                local colorpickerAPI = {
-                    RainbowMode = false,
-                    RainbowSpeed = 1,
-                    StartRainbow = function(speed)
-                        rainbowAPI.RainbowMode = true
-                        rainbowAPI.RainbowSpeed = speed or 1
-                        
-                        local hue = 0
-                        while rainbowAPI.RainbowMode and View do
-                            hue = (hue + 0.01 * rainbowAPI.RainbowSpeed) % 1
-                            color3 = Color3.fromHSV(hue, sat, brightness)
-                            View.BackgroundColor3 = color3
-                            NewView.BackgroundColor3 = color3
-                            ColorPicker.Callback(color3)
-                            
-                            UIGradient.Color = ColorSequence.new{
-                                ColorSequenceKeypoint.new(0.00, Color3.fromRGB(255, 255, 255)), 
-                                ColorSequenceKeypoint.new(1.00, Color3.fromHSV(hue, 1, 1))
-                            }
-                            
-                            wait(0.05)
-                        end
-                    end,
-                    StopRainbow = function()
-                        rainbowAPI.RainbowMode = false
-                    end,
-                    SetColor = function(color)
-                        if typeof(color) == "Color3" then
-                            View.BackgroundColor3 = color
-                        NewView.BackgroundColor3 = color
-                        ColorPicker.Callback(color)
-                        
-                        UIGradient.Color = ColorSequence.new{
-                            ColorSequenceKeypoint.new(0.00, Color3.fromRGB(255, 255, 255)), 
-                            ColorSequenceKeypoint.new(1.00, color)
-                        }
-                    end
-                end,
-                GetValue = function()
-                    return View.BackgroundColor3
-                end,
-                Update = function(newOptions)
-                    if newOptions.title then
-                        Title.Text = newOptions.title
-                    end
-                    if newOptions.default then
-                        colorpickerAPI.SetColor(newOptions.default)
-                    end
-                end
-            }
             
-            return setmetatable(ColorPickers, {__index = colorpickerAPI})
+            
+            return ColorPickers
         end
         
         function TabV:AddDropdown(Dropdown)
@@ -1656,35 +1534,7 @@ function imgui:CreateWindow(Window)
                 end
             end)
             
-            local dropdownAPI = {
-                SetOptions = function(newOptions)
-                    Dropdown.Options = newOptions
-                    createOptions()
-                    updateContainerSize()
-                end,
-                SetValue = function(newValue)
-                    if table.find(Dropdown.Options, newValue) then
-                        DValue.Text = newValue
-                        Dropdown.Callback(newValue)
-                    end
-                end,
-                GetValue = function()
-                    return DValue.Text
-                end,
-                Update = function(newOptions)
-                    if newOptions.title then
-                        Title.Text = newOptions.title
-                    end
-                    if newOptions.options then
-                        dropdownAPI.SetOptions(newOptions.options)
-                    end
-                    if newOptions.default then
-                        dropdownAPI.SetValue(newOptions.default)
-                    end
-                end
-            }
-            
-            return setmetatable(Drops, {__index = dropdownAPI})
+            return Drops
         end
         return TabV
     end
