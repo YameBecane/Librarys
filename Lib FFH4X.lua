@@ -256,45 +256,6 @@ function imgui:CreateWindow(Window)
             end
         end
     end)
-    
-    function imgui:CreateWindow(Window)
-        -- ... (código anterior permanece o mesmo até a criação dos elementos) ...
-    
-        -- Adicionando as funções de modificação
-        local windowAPI = {
-            SetTitle = function(newTitle)
-                Window.Title = newTitle
-                if Title then
-                    Title.Text = newTitle
-                end
-            end,
-            
-            SetTheme = function(newTheme)
-                Window.Theme = newTheme
-                local newConfig = self:GetThemeConfig(newTheme)
-                
-                -- Atualizar cores dos elementos
-                Main.BackgroundColor3 = newConfig.Back
-                Main.BackgroundTransparency = Window.Opacity and 0.080 or 0
-                Top.BackgroundColor3 = newConfig.Primary
-                HideT.BackgroundColor3 = newConfig.Primary
-                Title.TextColor3 = newConfig.Text
-                Title.Font = newConfig.Font
-                Title.TextSize = newConfig.TitleSize
-                -- Adicione mais atualizações de elementos conforme necessário
-            end,
-            
-            SetOpacity = function(newOpacity)
-                Window.Opacity = newOpacity
-                Main.BackgroundTransparency = newOpacity and 0.080 or 0
-            end
-        }
-    
-        -- ... (restante do código original) ...
-    
-        -- Retornando tanto Tabs quanto a API de modificação
-        return setmetatable(Tabs, {__index = windowAPI})
-    end
 
     local Tabs = {
         CurrentTab = nil
@@ -511,7 +472,6 @@ function imgui:CreateWindow(Window)
 			OnClick.TextSize = 0.000
 				
             local Value = Check.Default
-            Check.Callback(Check.Default)
             
             FCheck:GetPropertyChangedSignal("AbsoluteSize"):Connect(TabUpd)
             TabUpd()
@@ -519,6 +479,7 @@ function imgui:CreateWindow(Window)
             if Check.Default then
                 icon.Image = "rbxassetid://7733715400"
                 CheckHolder.BackgroundTransparency = 0.1
+                Check.Callback(Check.Default)
             else
                 icon.Image = ""
                 CheckHolder.BackgroundTransparency = 0.5
@@ -546,7 +507,9 @@ function imgui:CreateWindow(Window)
             
             local Toggles = {}
             local Value = Toggle.Default
-            Toggle.Callback(Toggle.Default)
+            if Toggle.Default then
+                Toggle.Callback(Toggle.Default)
+            end
             
             local FToggle = Instance.new("Frame")
             FToggle.Name = "FToggle"
@@ -1209,9 +1172,7 @@ function imgui:CreateWindow(Window)
                 UiOpen = not UiOpen
                 FMainColor.Visible = UiOpen
             end)
-            
-            
-            
+
             return ColorPickers
         end
         
@@ -1393,6 +1354,9 @@ function imgui:CreateWindow(Window)
                 UIPadding.PaddingTop = UDim.new(0, 5)
                 UIPadding.PaddingBottom = UDim.new(0, 5)
                 
+                FDrop:GetPropertyChangedSignal("AbsoluteSize"):Connect(TabUpd)
+                TabUpd()
+                
                 -- Substitua a função updateContainerPosition por esta:
                 local function updateContainerPosition()
                     local absolutePosition = DContent.AbsolutePosition
@@ -1536,8 +1500,10 @@ function imgui:CreateWindow(Window)
             
             return Drops
         end
+        
         return TabV
     end
     return Tabs
 end
+
 return imgui
