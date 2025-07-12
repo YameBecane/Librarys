@@ -1374,7 +1374,15 @@ function imgui:CreateWindow(Window)
                 
                 -- Função para criar os botões de opção
                 local function createOptions()
-                    for _, option in ipairs(Dropdown.Options) do
+        -- Limpa opções existentes primeiro
+        for _, child in ipairs(OptionsList:GetChildren()) do
+            if child.Name == "OptionButton" then
+                child:Destroy()
+            end
+        end
+
+        -- Cria novas opções
+                for _, option in ipairs(Dropdown.Options) do
                     local optionButton = Instance.new("TextButton")
                     optionButton.Name = "OptionButton"
                     optionButton.Parent = OptionsList
@@ -1498,6 +1506,29 @@ function imgui:CreateWindow(Window)
                 end
             end)
             
+            function Drops:UpdateOptions(newOptions, keepSelection)
+                -- Se não passar novas opções, mantém as atuais
+                Dropdown.Options = newOptions or Dropdown.Options
+                
+                -- Recria todas as opções
+                createOptions()
+                
+                -- Atualiza o tamanho do container
+                updateContainerSize()
+                
+                -- Verifica se a seleção atual ainda é válida
+                if not keepSelection then
+                    local currentText = DValue.Text
+                    if not table.find(Dropdown.Options, currentText) then
+                        DValue.Text = Dropdown.Default
+                    end
+                end
+            end
+        
+            -- Cria as opções iniciais
+            createOptions()
+            updateContainerSize()
+            
             return Drops
         end
         
@@ -1512,7 +1543,7 @@ function imgui:CreateWindow(Window)
             FButton.Parent = Scroll
             FButton.ClipsDescendants = false
             FButton.BackgroundTransparency = 0
-            FButton.BackgroundColor3 = Color3.fromRGB(35, 35, 35)
+            FButton.BackgroundColor3 = Color3.fromRGB(25, 25, 25)
             FButton.BorderSizePixel = 0
             FButton.Size = UDim2.new(1, -10, 0, 30)
             
